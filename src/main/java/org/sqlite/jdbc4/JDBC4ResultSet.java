@@ -9,6 +9,7 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.Clob;
@@ -27,6 +28,8 @@ import java.util.Map;
 
 import org.sqlite.core.CoreStatement;
 import org.sqlite.jdbc3.JDBC3ResultSet;
+
+import javax.sql.rowset.serial.SerialBlob;
 
 public class JDBC4ResultSet extends JDBC3ResultSet implements ResultSet, ResultSetMetaData {
 	
@@ -384,10 +387,22 @@ public class JDBC4ResultSet extends JDBC3ResultSet implements ResultSet, ResultS
 	@Deprecated
     public BigDecimal getBigDecimal(String col, int s)
         throws SQLException { throw unused(); }
-    public Blob getBlob(int col)
-        throws SQLException { throw unused(); }
-    public Blob getBlob(String col)
-        throws SQLException { throw unused(); }
+    public Blob getBlob(int col) throws SQLException {
+      String string = this.getString(col);
+      if (null == string || string.getBytes().length <= 0) {
+        return null;
+      }
+
+      return new SerialBlob(string.getBytes(StandardCharsets.UTF_8));
+    }
+    public Blob getBlob(String col) throws SQLException {
+      String string = this.getString(col);
+      if (null == string || string.getBytes().length <= 0) {
+        return null;
+      }
+
+      return new SerialBlob(string.getBytes(StandardCharsets.UTF_8));
+    }
     
     public Clob getClob(int col) throws SQLException { 
     	return new SqliteClob(getString(col)); 

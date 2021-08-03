@@ -288,7 +288,8 @@ public class FastDateParser implements DateParser, Serializable {
      * @see org.apache.commons.lang3.time.DateParser#parse(java.lang.String)
      */
     public Date parse(final String source) throws ParseException {
-        String normalizedSource = source.length() == 19 ? (source + ".000") : source;
+        String normalizedSource = source.length() == 10 ? (source + " 00:00:00.000") : source;
+        normalizedSource = source.length() == 19 ? (source + ".000") : source;
         final Date date= parse(normalizedSource, new ParsePosition(0));
         if(date==null) {
             // Add a note re supported date range
@@ -322,8 +323,9 @@ public class FastDateParser implements DateParser, Serializable {
      * {@inheritDoc}
      */
     public Date parse(final String source, final ParsePosition pos) {
+        String normalizedSource = source.length() == 10 ? (source + " 00:00:00.000") : source;
         final int offset= pos.getIndex();
-        final Matcher matcher= parsePattern.matcher(source.substring(offset));
+        final Matcher matcher= parsePattern.matcher(normalizedSource.substring(offset));
         if(!matcher.lookingAt()) {
             return null;
         }
